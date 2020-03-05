@@ -47,6 +47,22 @@ export enum AllocationStrategy {
 }
 
 /**
+ * Launch template property specification
+ */
+export interface LaunchTemplateSpecification {
+  /**
+   * The Launch template name
+   */
+  readonly launchTemplateName: string;
+  /**
+   * The launch template version to be used (optional).
+   *
+   * @default the default version of the launch template
+   */
+  readonly version?: string;
+}
+
+/**
  * Properties for defining the structure of the batch compute cluster.
  */
 export interface ComputeResources {
@@ -67,6 +83,16 @@ export interface ComputeResources {
    * @default AllocationStrategy.BEST_FIT
    */
   readonly allocationStrategy?: AllocationStrategy;
+
+  /**
+   * An optional launch template to associate with your compute resources. To use a launch template, you must
+   * specify either the launch template ID or launch template name in the request, but not both.
+   * For more information, see Launch Template Support.
+   *
+   * @default no custom launch template will be used
+   * @link https://docs.aws.amazon.com/batch/latest/userguide/launch-templates.html
+   */
+  readonly launchTemplate?: LaunchTemplateSpecification;
 
   /**
    * The Amazon ECS instance profile applied to Amazon EC2 instances in a compute environment. You can specify
@@ -333,6 +359,7 @@ export class ComputeEnvironment extends Resource implements IComputeEnvironment 
               }).roleName]
           }).attrArn,
         instanceTypes: this.buildInstanceTypes(props.computeResources.instanceTypes),
+        launchTemplate: props.computeResources.launchTemplate,
         maxvCpus: props.computeResources.maxvCpus || 256,
         minvCpus: props.computeResources.minvCpus || 0,
         securityGroupIds: this.buildSecurityGroupIds(props.computeResources.vpc, props.computeResources.securityGroups),
